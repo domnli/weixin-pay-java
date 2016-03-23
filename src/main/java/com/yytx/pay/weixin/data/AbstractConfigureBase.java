@@ -1,13 +1,10 @@
 package com.yytx.pay.weixin.data;
 
 import com.yytx.pay.weixin.bean.Configure;
-import com.yytx.pay.weixin.common.MD5;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+import com.yytx.pay.weixin.common.Signature;
 
 /**
+ * 统一下单数据实体
  * Created by domnli on 16/3/21.
  */
 public class AbstractConfigureBase extends AbstractBase {
@@ -51,25 +48,13 @@ public class AbstractConfigureBase extends AbstractBase {
         return (String) values.get("sub_mch_id");
     }
 
-    public void setSign(){
-        ArrayList<String> list = new ArrayList<String>();
-        for(Map.Entry<String,Object> entry:values.entrySet()){
-            if(entry.getValue()!=""){
-                list.add(entry.getKey() + "=" + entry.getValue() + "&");
-            }
-        }
-        int size = list.size();
-        String [] arrayToSort = list.toArray(new String[size]);
-        Arrays.sort(arrayToSort, String.CASE_INSENSITIVE_ORDER);
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < size; i ++) {
-            sb.append(arrayToSort[i]);
-        }
-        String result = sb.toString();
-        result += "key=" + Configure.getKey();
-        //Util.log("Sign Before MD5:" + result);
-        result = MD5.MD5Encode(result).toUpperCase();
-        //Util.log("Sign Result:" + result);
-        return result;
+    /**
+     * 签名
+     */
+    protected void setSign(){
+        String sign = Signature.getSign(values,configure.getKey());
+        values.put("sign",sign);
     }
+
+
 }
